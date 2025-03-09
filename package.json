@@ -1,0 +1,25 @@
+{
+  "name": "wasal-whatsapp-webhook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zeyadtamer99/Wasal-WhatsApp-Webhook.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/zeyadtamer99/Wasal-WhatsApp-Webhook/issues"
+  },
+  "homepage": "https://github.com/zeyadtamer99/Wasal-WhatsApp-Webhook#readme",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.2"
+  }
+}
