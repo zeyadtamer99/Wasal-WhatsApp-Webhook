@@ -1,23 +1,48 @@
 const express = require("express");
-const bodyParser = require("body-parser");
+const accountSid = "ACf0bc9c43235e011640fad71b5979f2dd";
+const authToken = "6a11e7cddb10ab971d21065a07d9abd8";
+const client = require("twilio")(accountSid, authToken);
 
 const app = express();
 
 // ✅ Enable JSON & URL-encoded parsing
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));  // This is the fix! ✅
+app.use(express.urlencoded({ extended: true }));
 
-// Webhook URL: Your server will listen for Twilio messages here
-app.post("/webhook", (req, res) => {
-    console.log("Received Webhook Data:", req.body); // Log the full request body
+// Webhook for incoming messages
+app.post("/webhook", async (req, res) => {
+    console.log("Received Webhook Data:", req.body);
 
-    // Extract message details
-    const from = req.body.From || "Unknown";  // Sender's WhatsApp number
-    const message = req.body.Body || "No message received";  // Message content
+    // Extract sender and message content
+    const from = req.body.From || "Unknown";
+    const message = req.body.Body || "No message received";
 
     console.log(`New WhatsApp Message from ${from}: ${message}`);
 
-    res.status(200).send("Webhook received! ✅");  // Respond to Twilio
+    // Define emoji-based responses
+    const emojiResponses = {
+        "✅": "شكرًا لك على تأكيد الحضور! 🎉 نتطلع لرؤيتك قريبًا.",
+        "🙏": "نتفهم تمامًا! بإذن الله تكون معنا في المناسبات القادمة. 😊",
+        "👍": "سعداء بحماسك! نراك قريبًا بإذن الله.",
+        "👎": "نأسف لسماع ذلك، نأمل أن نراك في المرات القادمة! 😊"
+    };
+
+    // Check if the message contains an emoji response
+    if (emojiResponses[message]) {
+        try {
+            await client.messages.create({
+                from: "whatsapp:+14155238886",
+                to: from,
+                body: emojiResponses[message]
+            });
+
+            console.log(`Sent response: ${emojiResponses[message]}`);
+        } catch (error) {
+            console.error("Error sending response:", error);
+        }
+    }
+
+    res.status(200).send("Webhook received! ✅"); // Respond to Twilio
 });
 
 // Start Server
