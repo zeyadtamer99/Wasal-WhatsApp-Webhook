@@ -15,13 +15,10 @@ app.post("/webhook", async (req, res) => {
 
     // Extract sender and user response
     const from = req.body.From || "Unknown";
-    const message = req.body.Body || "No message received";
-    const buttonResponse = req.body.ButtonPayload || null; // Detect button click response
-
+    const message = req.body.Body?.trim() || "No message received"; // Ensure message is clean
     console.log(`New WhatsApp Message from ${from}: ${message}`);
-    console.log(`Button Response: ${buttonResponse}`);
 
-    // Define responses based on List ID
+    // Define responses based on list selection
     const buttonResponses = {
         "yes": `شكراً لك..
 تأكيدك يعزز أهدافنا المشتركة، ويدعم انطلاق مجتمعنا بروحك وإضافتك.
@@ -32,11 +29,11 @@ app.post("/webhook", async (req, res) => {
 
     let replyMessage = "لم يتم اختيار عنصر صحيح."; // Default response if no match
 
-    // Check if the user clicked a valid button
-    if (buttonResponses[buttonResponse]) {
-        replyMessage = buttonResponses[buttonResponse];
+    // ✅ Check if the user selected a valid option
+    if (buttonResponses[message]) {
+        replyMessage = buttonResponses[message];
 
-        // ✅ Send reply based on user selection
+        // ✅ Send response message
         try {
             await client.messages.create({
                 from: "whatsapp:+14155238886",
