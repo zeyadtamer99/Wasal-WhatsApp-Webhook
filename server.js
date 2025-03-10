@@ -13,33 +13,38 @@ app.use(express.urlencoded({ extended: true }));
 app.post("/webhook", async (req, res) => {
     console.log("Received Webhook Data:", req.body);
 
-    // Extract sender and message content
+    // Extract sender and user response
     const from = req.body.From || "Unknown";
     const message = req.body.Body || "No message received";
+    const buttonResponse = req.body.ButtonPayload || null; // Detect button click response
 
     console.log(`New WhatsApp Message from ${from}: ${message}`);
+    console.log(`Button Response: ${buttonResponse}`);
 
-    // Define emoji-based responses
-    const emojiResponses = {
-        "✅": `شكراً لك..
+    // Define responses based on List ID
+    const buttonResponses = {
+        "yes": `شكراً لك..
 تأكيدك يعزز أهدافنا المشتركة، ويدعم انطلاق مجتمعنا بروحك وإضافتك.
 
 دُمنا على "وصل" 💜.`,
-        "🙏": "الجايات اكثر ان شاء الله",
-        "👍": "سعداء بحماسك! نراك قريبًا بإذن الله.",
-        "👎": "نأسف لسماع ذلك، نأمل أن نراك في المرات القادمة! 😊"
+        "no": "الجايات اكثر ان شاء الله"
     };
 
-    // Check if the message contains an emoji response
-    if (emojiResponses[message]) {
+    let replyMessage = "لم يتم اختيار عنصر صحيح."; // Default response if no match
+
+    // Check if the user clicked a valid button
+    if (buttonResponses[buttonResponse]) {
+        replyMessage = buttonResponses[buttonResponse];
+
+        // ✅ Send reply based on user selection
         try {
             await client.messages.create({
                 from: "whatsapp:+14155238886",
                 to: from,
-                body: emojiResponses[message]
+                body: replyMessage
             });
 
-            console.log(`Sent response: ${emojiResponses[message]}`);
+            console.log(`Sent response: ${replyMessage}`);
         } catch (error) {
             console.error("Error sending response:", error);
         }
